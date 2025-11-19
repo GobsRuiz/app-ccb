@@ -45,5 +45,6 @@ app.*.map.json
 /android/app/release
 
 *.md
-.local.json
+*.local.json
+settings.local.json
 .claude

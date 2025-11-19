@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:forui/forui.dart';
 
 import 'pages/home_page.dart';
 import 'pages/favorites_page.dart';
@@ -15,10 +15,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ShadApp(
+    return MaterialApp(
       title: 'App Igreja',
-      themeMode: ThemeMode.light,
-      home: const MainShell(),
+      theme: ThemeData(
+        useMaterial3: true,
+        brightness: Brightness.light,
+      ),
+      home: FTheme(
+        data: FThemes.zinc.light,
+        child: const MainShell(),
+      ),
     );
   }
 }
@@ -42,10 +48,10 @@ class _MainShellState extends State<MainShell> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = ShadTheme.of(context);
+    final theme = context.theme;
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.background,
+      backgroundColor: theme.colors.background,
       body: SafeArea(
         child: IndexedStack(
           index: _currentIndex,
@@ -60,24 +66,24 @@ class _MainShellState extends State<MainShell> {
           });
         },
         type: BottomNavigationBarType.fixed,
-        backgroundColor: theme.colorScheme.background,
-        selectedItemColor: theme.colorScheme.primary,
-        unselectedItemColor: theme.colorScheme.mutedForeground,
+        backgroundColor: theme.colors.background,
+        selectedItemColor: theme.colors.primary,
+        unselectedItemColor: theme.colors.mutedForeground,
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(LucideIcons.house),
+            icon: Icon(FIcons.house),
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(LucideIcons.star),
+            icon: Icon(FIcons.star),
             label: 'Favoritos',
           ),
           BottomNavigationBarItem(
-            icon: Icon(LucideIcons.bell),
+            icon: Icon(FIcons.bell),
             label: 'Notificações',
           ),
           BottomNavigationBarItem(
-            icon: Icon(LucideIcons.user),
+            icon: Icon(FIcons.user),
             label: 'Perfil',
           ),
         ],

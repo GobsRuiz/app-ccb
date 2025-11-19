@@ -1,26 +1,37 @@
 import 'package:flutter/material.dart';
-import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:forui/forui.dart';
 
 class FavoritesPage extends StatelessWidget {
   const FavoritesPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final theme = ShadTheme.of(context);
+    final theme = context.theme;
 
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            LucideIcons.star,
+            FIcons.star,
             size: 64,
-            color: theme.colorScheme.primary,
+            color: theme.colors.primary,
           ),
           const SizedBox(height: 16),
-          Text('Favoritos', style: theme.textTheme.h2),
+          Text(
+            'Favoritos',
+            style: theme.typography.xl2.copyWith(
+              fontWeight: FontWeight.bold,
+              color: theme.colors.foreground,
+            ),
+          ),
           const SizedBox(height: 8),
-          Text('Seus itens favoritos', style: theme.textTheme.muted),
+          Text(
+            'Seus itens favoritos',
+            style: theme.typography.sm.copyWith(
+              color: theme.colors.mutedForeground,
+            ),
+          ),
         ],
       ),
     );

@@ -5,7 +5,14 @@
       "Bash(flutter doctor:*)",
       "Bash(flutter devices:*)",
       "Bash(flutter emulators:*)",
-      "Bash(flutter pub get:*)"
+      "Bash(flutter pub get:*)",
+      "Bash(cat:*)",
+      "Bash(flutter pub:*)",
+      "Bash(findstr:*)",
+      "WebFetch",
+      "WebSearch",
+      "Bash(flutter analyze:*)",
+      "Bash(powershell -Command \"Get-Date -Format ''dd-MM-HHmm''\")"
     ],
     "deny": [],
     "ask": []

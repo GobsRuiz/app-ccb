@@ -12,7 +12,9 @@
       "WebFetch",
       "WebSearch",
       "Bash(flutter analyze:*)",
-      "Bash(powershell -Command \"Get-Date -Format ''dd-MM-HHmm''\")"
+      "Bash(powershell -Command \"Get-Date -Format ''dd-MM-HHmm''\")",
+      "Bash(flutter run:*)",
+      "Bash(flutter attach:*)"
     ],
     "deny": [],
     "ask": []

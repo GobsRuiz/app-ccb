@@ -91,6 +91,7 @@ class _HomePageState extends State<HomePage> {
           title: Row(
             children: [
               FBadge(
+                style: FBadgeStyle.outline(),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -102,7 +103,9 @@ class _HomePageState extends State<HomePage> {
                     const SizedBox(width: 6),
                     Text(
                       eventProvider.selectedCity,
-                      style: theme.typography.sm,
+                      style: theme.typography.sm.copyWith(
+                        color: theme.colors.foreground,
+                      ),
                     ),
                   ],
                 ),
@@ -125,7 +128,9 @@ class _HomePageState extends State<HomePage> {
                     const SizedBox(width: 4),
                     Text(
                       connectivityProvider.isOnline ? 'Online' : 'Cache',
-                      style: theme.typography.xs,
+                      style: theme.typography.xs.copyWith(
+                        color: theme.colors.foreground,
+                      ),
                     ),
                   ],
                 ),

@@ -11,12 +11,14 @@ class FilterModal extends StatefulWidget {
 }
 
 class _FilterModalState extends State<FilterModal> {
-  late TextEditingController _searchController;
+  late TextEditingController _stateController;
   late TextEditingController _cityController;
   late double _radius;
   DateTime? _startDate;
   DateTime? _endDate;
   final Set<String> _selectedTypes = {};
+  String _selectedState = 'SP';
+  String _selectedCity = 'São Paulo';
 
   final List<String> _eventTypes = [
     'Culto',
@@ -27,21 +29,103 @@ class _FilterModalState extends State<FilterModal> {
     'Evento Especial',
   ];
 
+  final Map<String, String> _states = {
+    'AC': 'Acre',
+    'AL': 'Alagoas',
+    'AP': 'Amapá',
+    'AM': 'Amazonas',
+    'BA': 'Bahia',
+    'CE': 'Ceará',
+    'DF': 'Distrito Federal',
+    'ES': 'Espírito Santo',
+    'GO': 'Goiás',
+    'MA': 'Maranhão',
+    'MT': 'Mato Grosso',
+    'MS': 'Mato Grosso do Sul',
+    'MG': 'Minas Gerais',
+    'PA': 'Pará',
+    'PB': 'Paraíba',
+    'PR': 'Paraná',
+    'PE': 'Pernambuco',
+    'PI': 'Piauí',
+    'RJ': 'Rio de Janeiro',
+    'RN': 'Rio Grande do Norte',
+    'RS': 'Rio Grande do Sul',
+    'RO': 'Rondônia',
+    'RR': 'Roraima',
+    'SC': 'Santa Catarina',
+    'SP': 'São Paulo',
+    'SE': 'Sergipe',
+    'TO': 'Tocantins',
+  };
+
+  final Map<String, List<String>> _citiesByState = {
+    'AC': ['Rio Branco'],
+    'AL': ['Maceió'],
+    'AP': ['Macapá'],
+    'AM': ['Manaus'],
+    'BA': ['Salvador'],
+    'CE': ['Fortaleza'],
+    'DF': ['Brasília'],
+    'ES': ['Vitória'],
+    'GO': ['Goiânia'],
+    'MA': ['São Luís'],
+    'MT': ['Cuiabá'],
+    'MS': ['Campo Grande'],
+    'MG': ['Belo Horizonte'],
+    'PA': ['Belém'],
+    'PB': ['João Pessoa'],
+    'PR': ['Curitiba'],
+    'PE': ['Recife'],
+    'PI': ['Teresina'],
+    'RJ': ['Rio de Janeiro'],
+    'RN': ['Natal'],
+    'RS': ['Porto Alegre'],
+    'RO': ['Porto Velho'],
+    'RR': ['Boa Vista'],
+    'SC': ['Florianópolis'],
+    'SP': [
+      'São Paulo',
+      'Ribeirão Preto',
+      'São Carlos',
+      'Taquaritinga',
+      'Matão',
+      'Catanduva',
+      'Guariroba',
+      'Guariba',
+      'São José do Rio Preto',
+      'Araraquara',
+      'Barretos',
+    ],
+    'SE': ['Aracaju'],
+    'TO': ['Palmas'],
+  };
+
   @override
   void initState() {
     super.initState();
     final provider = context.read<EventProvider>();
-    _searchController = TextEditingController(text: provider.searchQuery);
-    _cityController = TextEditingController(text: provider.selectedCity);
     _radius = provider.radiusKm;
     _startDate = provider.startDate;
     _endDate = provider.endDate;
     _selectedTypes.addAll(provider.selectedEventTypes);
+
+    final city = provider.selectedCity;
+    for (final entry in _citiesByState.entries) {
+      if (entry.value.contains(city)) {
+        _selectedState = entry.key;
+        _selectedCity = city;
+        break;
+      }
+    }
+
+    _stateController = TextEditingController(text: '${_states[_selectedState]} ($_selectedState)');
+    _cityController = TextEditingController(text: _selectedCity);
   }
 
   @override
   void dispose() {
-    _searchController.dispose();
+    _stateController.dispose();
     _cityController.dispose();
     super.dispose();
   }
@@ -71,8 +155,7 @@ class _FilterModalState extends State<FilterModal> {
 
   void _applyFilters() {
     final provider = context.read<EventProvider>();
-    provider.setSearchQuery(_searchController.text);
-    provider.setCity(_cityController.text);
+    provider.setCity(_selectedCity);
     provider.setRadius(_radius);
     provider.setDateRange(_startDate, _endDate);
 
@@ -93,8 +176,8 @@ class _FilterModalState extends State<FilterModal> {
 
   void _clearFilters() {
     setState(() {
-      _searchController.clear();
-      _cityController.text = 'São Paulo';
+      _selectedState = 'SP';
+      _selectedCity = 'São Paulo';
       _radius = 10.0;
       _startDate = null;
       _endDate = null;
@@ -138,16 +221,51 @@ class _FilterModalState extends State<FilterModal> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Busca',
+                      'Estado',
                       style: theme.typography.sm.copyWith(
                         fontWeight: FontWeight.w600,
                         color: theme.colors.foreground,
                       ),
                     ),
                     const SizedBox(height: 8),
-                    FTextField(
-                      controller: _searchController,
-                      hint: 'Buscar eventos...',
+                    Autocomplete<String>(
+                      initialValue: TextEditingValue(text: _stateController.text),
+                      optionsBuilder: (textEditingValue) {
+                        if (textEditingValue.text.isEmpty) {
+                          return _states.entries.map((e) => '${e.value} (${e.key})');
+                        }
+                        return _states.entries
+                            .where((entry) =>
+                                entry.value.toLowerCase().contains(textEditingValue.text.toLowerCase()) ||
+                                entry.key.toLowerCase().contains(textEditingValue.text.toLowerCase()))
+                            .map((e) => '${e.value} (${e.key})');
+                      },
+                      onSelected: (String selection) {
+                        final uf = selection.substring(selection.lastIndexOf('(') + 1, selection.lastIndexOf(')'));
+                        setState(() {
+                          _selectedState = uf;
+                          final cities = _citiesByState[uf] ?? [];
+                          _selectedCity = cities.isNotEmpty ? cities.first : '';
+                          _stateController.text = selection;
+                          _cityController.text = _selectedCity;
+                        });
+                      },
+                      fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
+                        if (controller.text.isEmpty && _stateController.text.isNotEmpty) {
+                          controller.text = _stateController.text;
+                        }
+                        return TextField(
+                          controller: controller,
+                          focusNode: focusNode,
+                          decoration: InputDecoration(
+                            hintText: 'Buscar estado...',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                          ),
+                        );
+                      },
                     ),
                     const SizedBox(height: 16),
                     Text(
@@ -158,9 +276,36 @@ class _FilterModalState extends State<FilterModal> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    FTextField(
-                      controller: _cityController,
-                      hint: 'Digite a cidade',
+                    Autocomplete<String>(
+                      key: ValueKey(_selectedState),
+                      initialValue: TextEditingValue(text: _selectedCity),
+                      optionsBuilder: (textEditingValue) {
+                        final cities = _citiesByState[_selectedState] ?? [];
+                        if (textEditingValue.text.isEmpty) {
+                          return cities;
+                        }
+                        return cities.where((city) =>
+                            city.toLowerCase().contains(textEditingValue.text.toLowerCase()));
+                      },
+                      onSelected: (String selection) {
+                        setState(() {
+                          _selectedCity = selection;
+                          _cityController.text = selection;
+                        });
+                      },
+                      fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
+                        return TextField(
+                          controller: controller,
+                          focusNode: focusNode,
+                          decoration: InputDecoration(
+                            hintText: 'Buscar cidade...',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                          ),
+                        );
+                      },
                     ),
                     const SizedBox(height: 16),
                     Text(

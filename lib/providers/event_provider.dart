@@ -6,7 +6,7 @@ class EventProvider with ChangeNotifier {
   List<Event> _filteredEvents = [];
 
   String _selectedCity = 'São Paulo';
-  Set<String> _selectedEventTypes = {};
+  final Set<String> _selectedEventTypes = {};
   DateTime? _startDate;
   DateTime? _endDate;
   String _searchQuery = '';

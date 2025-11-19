@@ -98,16 +98,117 @@ class EventDetailModal extends StatelessWidget {
                   controller: scrollController,
                   padding: const EdgeInsets.all(16.0),
                   children: [
-                    FButton(
-                      onPress: _openMap,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Icon(FIcons.mapPin, size: 20),
-                          SizedBox(width: 8),
-                          Text('Abrir no Mapa'),
-                        ],
-                      ),
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: FButton(
+                            onPress: _openMap,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: const [
+                                Icon(FIcons.mapPin, size: 14),
+                                SizedBox(width: 4),
+                                Flexible(
+                                  child: Text(
+                                    'Mapa',
+                                    style: TextStyle(fontSize: 11),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          flex: 2,
+                          child: Consumer<EventProvider>(
+                            builder: (context, provider, child) {
+                              return FButton(
+                                onPress: () {
+                                  provider.toggleFavorite(event.id);
+                                },
+                                style: event.isFavorite
+                                    ? FButtonStyle.primary()
+                                    : FButtonStyle.outline(),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(FIcons.star, size: 14),
+                                    const SizedBox(width: 4),
+                                    Flexible(
+                                      child: Text(
+                                        event.isFavorite ? 'Favoritado' : 'Favoritar',
+                                        style: const TextStyle(fontSize: 11),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          flex: 2,
+                          child: FButton(
+                            onPress: () {
+                              final overlay = Overlay.of(context);
+                              final overlayEntry = OverlayEntry(
+                                builder: (context) => Positioned(
+                                  bottom: 16,
+                                  left: 16,
+                                  right: 16,
+                                  child: Material(
+                                    color: Colors.transparent,
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 14,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF323232),
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: const Text(
+                                        'Você será notificado sobre este evento',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+
+                              overlay.insert(overlayEntry);
+
+                              // Remove após 2 segundos
+                              Future.delayed(const Duration(seconds: 2), () {
+                                overlayEntry.remove();
+                              });
+                            },
+                            style: FButtonStyle.outline(),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: const [
+                                Icon(FIcons.bell, size: 14),
+                                SizedBox(width: 4),
+                                Flexible(
+                                  child: Text(
+                                    'Notificar',
+                                    style: TextStyle(fontSize: 11),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 24),
                     _buildSection(
@@ -194,85 +295,6 @@ class EventDetailModal extends StatelessWidget {
               style: theme.typography.sm.copyWith(
                 color: theme.colors.mutedForeground,
               ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class EventDetailModalFooter extends StatelessWidget {
-  final Event event;
-
-  const EventDetailModalFooter({
-    super.key,
-    required this.event,
-  });
-
-  Future<void> _shareEvent(BuildContext context) async {
-    final text = '''
-${event.title}
-
-Data: ${DateFormat('dd/MM/yyyy').format(event.date)} às ${event.time}
-Local: ${event.church}
-Endereço: ${event.address}
-''';
-
-    final url = Uri.parse('sms:?body=${Uri.encodeComponent(text)}');
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = context.theme;
-    final provider = context.watch<EventProvider>();
-
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: theme.colors.background,
-        border: Border(
-          top: BorderSide(color: theme.colors.border),
-        ),
-      ),
-      child: SafeArea(
-        child: Row(
-          children: [
-            Expanded(
-              child: FButton(
-                onPress: () => _shareEvent(context),
-                style: FButtonStyle.outline(),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(FIcons.share2, size: 16),
-                    SizedBox(width: 8),
-                    Text('Compartilhar'),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            FButton(
-              onPress: () {
-                provider.toggleFavorite(event.id);
-              },
-              style: event.isFavorite
-                  ? FButtonStyle.primary()
-                  : FButtonStyle.outline(),
-              child: Icon(
-                FIcons.star,
-                size: 20,
-              ),
-            ),
-            const SizedBox(width: 12),
-            FButton(
-              onPress: () {},
-              style: FButtonStyle.outline(),
-              child: const Icon(FIcons.bell, size: 20),
             ),
           ],
         ),

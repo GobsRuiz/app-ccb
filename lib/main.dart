@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:provider/provider.dart';
 
 import 'pages/home_page.dart';
 import 'pages/favorites_page.dart';
 import 'pages/notifications_page.dart';
 import 'pages/profile_page.dart';
+import 'providers/event_provider.dart';
+import 'providers/connectivity_provider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,15 +18,21 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'App Igreja',
-      theme: ThemeData(
-        useMaterial3: true,
-        brightness: Brightness.light,
-      ),
-      home: FTheme(
-        data: FThemes.zinc.light,
-        child: const MainShell(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => EventProvider()),
+        ChangeNotifierProvider(create: (_) => ConnectivityProvider()),
+      ],
+      child: MaterialApp(
+        title: 'App Igreja',
+        theme: ThemeData(
+          useMaterial3: true,
+          brightness: Brightness.light,
+        ),
+        home: FTheme(
+          data: FThemes.zinc.light,
+          child: const MainShell(),
+        ),
       ),
     );
   }

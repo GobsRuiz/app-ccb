@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:intl/intl.dart';
 import '../models/event.dart';
+import '../utils/formatters.dart';
 
 class EventCard extends StatelessWidget {
   final Event event;
@@ -14,10 +14,6 @@ class EventCard extends StatelessWidget {
     required this.onDetailsPressed,
     required this.onNavigatePressed,
   });
-
-  String _formatDate(DateTime date) {
-    return DateFormat('dd/MM/yyyy').format(date);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +54,7 @@ class EventCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  '${_formatDate(event.date)} às ${event.time}',
+                  '${Formatters.formatDate(event.date)} às ${event.time}',
                   style: theme.typography.sm.copyWith(
                     color: theme.colors.mutedForeground,
                   ),

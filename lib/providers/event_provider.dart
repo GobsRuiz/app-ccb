@@ -23,6 +23,14 @@ class EventProvider with ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
+  String? _error;
+  String? get error => _error;
+
+  void clearError() {
+    _error = null;
+    notifyListeners();
+  }
+
   EventProvider() {
     _loadMockData();
   }
@@ -165,13 +173,34 @@ class EventProvider with ChangeNotifier {
   }
 
   Future<void> refreshEvents() async {
-    _isLoading = true;
-    notifyListeners();
+    try {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
 
-    await Future.delayed(const Duration(seconds: 1));
-    _loadMockData();
+      // Simula delay de rede (em produção, seria chamada à API)
+      await Future.delayed(const Duration(seconds: 1));
 
-    _isLoading = false;
-    notifyListeners();
+      // TODO: Futuramente substituir por chamada à API
+      // final response = await apiService.getEvents();
+      // final jsonList = response.data as List;
+      // _allEvents = jsonList.map((json) => Event.fromJson(json)).toList();
+
+      // Por ora, apenas recarrega dados mock
+      _loadMockData();
+
+      _isLoading = false;
+      notifyListeners();
+    } catch (e, stack) {
+      debugPrint('Error in refreshEvents: $e');
+      debugPrint('Stack trace: $stack');
+
+      _error = 'Erro ao carregar eventos. Tente novamente.';
+      _isLoading = false;
+      notifyListeners();
+
+      // Re-lança para permitir tratamento no UI se necessário
+      rethrow;
+    }
   }
 }

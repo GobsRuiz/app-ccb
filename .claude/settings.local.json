@@ -14,7 +14,10 @@
       "Bash(flutter analyze:*)",
       "Bash(powershell -Command \"Get-Date -Format ''dd-MM-HHmm''\")",
       "Bash(flutter run:*)",
-      "Bash(flutter attach:*)"
+      "Bash(flutter attach:*)",
+      "Bash(mkdir:*)",
+      "Bash(flutter test:*)",
+      "Bash(powershell:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,12 +1,16 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../core/error_handler.dart';
 import '../models/event.dart';
 import '../providers/event_provider.dart';
+import '../services/map_service.dart';
+import '../utils/formatters.dart';
 
-class EventDetailModal extends StatelessWidget {
+class EventDetailModal extends StatefulWidget {
   final Event event;
 
   const EventDetailModal({
@@ -14,17 +18,36 @@ class EventDetailModal extends StatelessWidget {
     required this.event,
   });
 
-  String _formatDate(DateTime date) {
-    return DateFormat('dd/MM/yyyy').format(date);
+  @override
+  State<EventDetailModal> createState() => _EventDetailModalState();
+}
+
+class _EventDetailModalState extends State<EventDetailModal> {
+  Timer? _toastTimer;
+
+  @override
+  void dispose() {
+    // Cancela o timer ao destruir o widget
+    _toastTimer?.cancel();
+    super.dispose();
   }
 
   Future<void> _openMap() async {
-    final url = Uri.parse(
-      'https://www.google.com/maps/search/?api=1&query=${event.latitude},${event.longitude}',
-    );
+    try {
+      final url = MapService.getMapsUrl(widget.event.latitude, widget.event.longitude);
 
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url, mode: LaunchMode.externalApplication);
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url, mode: LaunchMode.externalApplication);
+      } else {
+        if (mounted) {
+          ErrorHandler.showToUser(context, 'Não foi possível abrir o mapa');
+        }
+      }
+    } catch (e, stack) {
+      ErrorHandler.handle(e, stack, context: 'EventDetailModal._openMap');
+      if (mounted) {
+        ErrorHandler.showToUser(context, 'Erro ao abrir o mapa');
+      }
     }
   }
 
@@ -77,7 +100,7 @@ class EventDetailModal extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            event.title,
+                            widget.event.title,
                             style: theme.typography.xl2.copyWith(
                               fontWeight: FontWeight.bold,
                               color: theme.colors.foreground,
@@ -128,9 +151,9 @@ class EventDetailModal extends StatelessWidget {
                             builder: (context, provider, child) {
                               return FButton(
                                 onPress: () {
-                                  provider.toggleFavorite(event.id);
+                                  provider.toggleFavorite(widget.event.id);
                                 },
-                                style: event.isFavorite
+                                style: widget.event.isFavorite
                                     ? FButtonStyle.primary()
                                     : FButtonStyle.outline(),
                                 child: Row(
@@ -141,7 +164,7 @@ class EventDetailModal extends StatelessWidget {
                                     const SizedBox(width: 4),
                                     Flexible(
                                       child: Text(
-                                        event.isFavorite ? 'Favoritado' : 'Favoritar',
+                                        widget.event.isFavorite ? 'Favoritado' : 'Favoritar',
                                         style: const TextStyle(fontSize: 11),
                                         overflow: TextOverflow.ellipsis,
                                       ),
@@ -157,6 +180,9 @@ class EventDetailModal extends StatelessWidget {
                           flex: 2,
                           child: FButton(
                             onPress: () {
+                              // Cancela timer anterior se existir
+                              _toastTimer?.cancel();
+
                               final overlay = Overlay.of(context);
                               final overlayEntry = OverlayEntry(
                                 builder: (context) => Positioned(
@@ -185,9 +211,12 @@ class EventDetailModal extends StatelessWidget {
 
                               overlay.insert(overlayEntry);
 
-                              // Remove após 2 segundos
-                              Future.delayed(const Duration(seconds: 2), () {
-                                overlayEntry.remove();
+                              // Cria timer e armazena referência
+                              _toastTimer = Timer(const Duration(seconds: 2), () {
+                                // Verifica se o overlay entry ainda está montado
+                                if (overlayEntry.mounted) {
+                                  overlayEntry.remove();
+                                }
                               });
                             },
                             style: FButtonStyle.outline(),
@@ -215,36 +244,36 @@ class EventDetailModal extends StatelessWidget {
                       context,
                       icon: FIcons.calendar,
                       title: 'Data e Hora',
-                      content: '${_formatDate(event.date)} às ${event.time}',
+                      content: '${Formatters.formatDate(widget.event.date)} às ${widget.event.time}',
                     ),
                     const SizedBox(height: 16),
                     _buildSection(
                       context,
                       icon: FIcons.mapPin,
                       title: 'Local',
-                      content: '${event.church}\n${event.address}',
+                      content: '${widget.event.church}\n${widget.event.address}',
                     ),
                     const SizedBox(height: 16),
                     _buildSection(
                       context,
                       icon: FIcons.user,
                       title: 'Regente',
-                      content: event.conductor,
+                      content: widget.event.conductor,
                     ),
                     const SizedBox(height: 16),
                     _buildSection(
                       context,
                       icon: FIcons.fileText,
                       title: 'Descrição',
-                      content: event.description,
+                      content: widget.event.description,
                     ),
-                    if (event.attachments.isNotEmpty) ...[
+                    if (widget.event.attachments.isNotEmpty) ...[
                       const SizedBox(height: 16),
                       _buildSection(
                         context,
                         icon: FIcons.paperclip,
                         title: 'Anexos',
-                        content: '${event.attachments.length} arquivo(s) anexado(s)',
+                        content: '${widget.event.attachments.length} arquivo(s) anexado(s)',
                       ),
                     ],
                     const SizedBox(height: 80),

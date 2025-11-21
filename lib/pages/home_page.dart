@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../core/error_handler.dart';
 import '../models/event.dart';
 import '../providers/event_provider.dart';
 import '../providers/connectivity_provider.dart';
+import '../services/map_service.dart';
 import '../widgets/event_card.dart';
 import '../widgets/filter_modal.dart';
 import '../widgets/event_detail_modal.dart';
@@ -27,13 +29,8 @@ class _HomePageState extends State<HomePage> {
 
   String _selectedQuickFilter = 'Todos';
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<EventProvider>().refreshEvents();
-    });
-  }
+  // initState removido - não precisa mais chamar refreshEvents()
+  // Os dados já são carregados no construtor do EventProvider
 
   void _showFilterModal() {
     showDialog(
@@ -52,12 +49,21 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _navigateToEvent(Event event) async {
-    final url = Uri.parse(
-      'https://www.google.com/maps/search/?api=1&query=${event.latitude},${event.longitude}',
-    );
+    try {
+      final url = MapService.getMapsUrl(event.latitude, event.longitude);
 
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url, mode: LaunchMode.externalApplication);
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url, mode: LaunchMode.externalApplication);
+      } else {
+        if (mounted) {
+          ErrorHandler.showToUser(context, 'Não foi possível abrir o mapa');
+        }
+      }
+    } catch (e, stack) {
+      ErrorHandler.handle(e, stack, context: 'HomePage._navigateToEvent');
+      if (mounted) {
+        ErrorHandler.showToUser(context, 'Erro ao abrir o mapa');
+      }
     }
   }
 

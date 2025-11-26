@@ -3,6 +3,7 @@ import 'package:forui/forui.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../core/error_handler.dart';
+import '../data/brazil_locations.dart';
 import '../models/event.dart';
 import '../providers/event_provider.dart';
 import '../providers/connectivity_provider.dart';
@@ -21,10 +22,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final List<String> _quickFilters = [
     'Todos',
-    'Culto',
-    'Estudo',
-    'Vigília',
-    'Conferência',
+    ...BrazilLocations.eventTypes,
   ];
 
   String _selectedQuickFilter = 'Todos';
@@ -33,8 +31,10 @@ class _HomePageState extends State<HomePage> {
   // Os dados já são carregados no construtor do EventProvider
 
   void _showFilterModal() {
-    showDialog(
+    showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       builder: (context) => const FilterModal(),
     );
   }

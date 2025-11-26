@@ -17,7 +17,9 @@
       "Bash(flutter attach:*)",
       "Bash(mkdir:*)",
       "Bash(flutter test:*)",
-      "Bash(powershell:*)"
+      "Bash(powershell:*)",
+      "Bash(tree:*)",
+      "Bash(cd react-native/app/\"(tabs)\")"
     ],
     "deny": [],
     "ask": []

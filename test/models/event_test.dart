@@ -12,6 +12,7 @@ void main() {
         'time': '19:00',
         'church': 'Igreja Batista Central',
         'address': 'Rua das Flores, 123',
+        'city': 'São Paulo',
         'conductor': 'Pastor João Silva',
         'description': 'Culto especial de louvor e adoração',
         'latitude': -23.550520,
@@ -19,6 +20,7 @@ void main() {
         'attachments': ['file1.pdf', 'file2.pdf'],
         'eventType': 'Culto',
         'isFavorite': true,
+        'isNotifying': true,
       };
 
       // Act
@@ -31,6 +33,7 @@ void main() {
       expect(event.time, '19:00');
       expect(event.church, 'Igreja Batista Central');
       expect(event.address, 'Rua das Flores, 123');
+      expect(event.city, 'São Paulo');
       expect(event.conductor, 'Pastor João Silva');
       expect(event.description, 'Culto especial de louvor e adoração');
       expect(event.latitude, -23.550520);
@@ -38,6 +41,7 @@ void main() {
       expect(event.attachments, ['file1.pdf', 'file2.pdf']);
       expect(event.eventType, 'Culto');
       expect(event.isFavorite, true);
+      expect(event.isNotifying, true);
     });
 
     test('should parse JSON with optional fields as null', () {
@@ -49,12 +53,13 @@ void main() {
         'time': '20:00',
         'church': 'Igreja Presbiteriana',
         'address': 'Av. Paulista, 456',
+        'city': 'São Paulo',
         'conductor': 'Pastor Maria Santos',
         'description': 'Estudo do livro de Romanos',
         'latitude': -23.561684,
         'longitude': -46.655981,
         'eventType': 'Estudo',
-        // attachments e isFavorite omitidos (opcionais)
+        // attachments, isFavorite e isNotifying omitidos (opcionais)
       };
 
       // Act
@@ -63,6 +68,7 @@ void main() {
       // Assert
       expect(event.attachments, isEmpty);
       expect(event.isFavorite, false);
+      expect(event.isNotifying, false);
     });
 
     test('should throw FormatException when id is null', () {
@@ -74,6 +80,7 @@ void main() {
         'time': '19:00',
         'church': 'Igreja Batista Central',
         'address': 'Rua das Flores, 123',
+        'city': 'São Paulo',
         'conductor': 'Pastor João Silva',
         'description': 'Culto especial',
         'latitude': -23.550520,
@@ -97,6 +104,7 @@ void main() {
         'time': '19:00',
         'church': 'Igreja Batista Central',
         'address': 'Rua das Flores, 123',
+        'city': 'São Paulo',
         'conductor': 'Pastor João Silva',
         'description': 'Culto especial',
         'latitude': -23.550520,
@@ -120,6 +128,7 @@ void main() {
         'time': '19:00',
         'church': 'Igreja Batista Central',
         'address': 'Rua das Flores, 123',
+        'city': 'São Paulo',
         'conductor': 'Pastor João Silva',
         'description': 'Culto especial',
         'latitude': -23.550520,
@@ -143,6 +152,7 @@ void main() {
         'time': '19:00',
         'church': 'Igreja Batista Central',
         'address': 'Rua das Flores, 123',
+        'city': 'São Paulo',
         'conductor': 'Pastor João Silva',
         'description': 'Culto especial',
         'latitude': 95.0, // Fora do range válido (-90 a 90)
@@ -166,6 +176,7 @@ void main() {
         'time': '19:00',
         'church': 'Igreja Batista Central',
         'address': 'Rua das Flores, 123',
+        'city': 'São Paulo',
         'conductor': 'Pastor João Silva',
         'description': 'Culto especial',
         'latitude': -23.550520,
@@ -189,6 +200,7 @@ void main() {
         'time': '19:00',
         'church': 'Igreja Batista Central',
         // 'address': 'Rua das Flores, 123', // Campo obrigatório ausente
+        'city': 'São Paulo',
         'conductor': 'Pastor João Silva',
         'description': 'Culto especial',
         'latitude': -23.550520,
@@ -212,6 +224,7 @@ void main() {
         'time': '19:00',
         'church': 'Igreja Batista Central',
         'address': 'Rua das Flores, 123',
+        'city': 'São Paulo',
         'conductor': 'Pastor João Silva',
         'description': 'Culto especial',
         'latitude': 90.0, // Máximo válido
@@ -236,6 +249,7 @@ void main() {
         'time': '19:00',
         'church': 'Igreja Batista Central',
         'address': 'Rua das Flores, 123',
+        'city': 'São Paulo',
         'conductor': 'Pastor João Silva',
         'description': 'Culto especial',
         'latitude': -90.0, // Mínimo válido
@@ -262,6 +276,7 @@ void main() {
         time: '19:00',
         church: 'Igreja Batista Central',
         address: 'Rua das Flores, 123',
+        city: 'São Paulo',
         conductor: 'Pastor João Silva',
         description: 'Culto especial',
         latitude: -23.550520,
@@ -269,6 +284,7 @@ void main() {
         attachments: ['file1.pdf'],
         eventType: 'Culto',
         isFavorite: true,
+        isNotifying: true,
       );
 
       // Act
@@ -281,6 +297,7 @@ void main() {
       expect(json['time'], '19:00');
       expect(json['church'], 'Igreja Batista Central');
       expect(json['address'], 'Rua das Flores, 123');
+      expect(json['city'], 'São Paulo');
       expect(json['conductor'], 'Pastor João Silva');
       expect(json['description'], 'Culto especial');
       expect(json['latitude'], -23.550520);
@@ -288,6 +305,7 @@ void main() {
       expect(json['attachments'], ['file1.pdf']);
       expect(json['eventType'], 'Culto');
       expect(json['isFavorite'], true);
+      expect(json['isNotifying'], true);
     });
   });
 
@@ -301,24 +319,28 @@ void main() {
         time: '19:00',
         church: 'Igreja Batista Central',
         address: 'Rua das Flores, 123',
+        city: 'São Paulo',
         conductor: 'Pastor João Silva',
         description: 'Culto especial',
         latitude: -23.550520,
         longitude: -46.633308,
         eventType: 'Culto',
         isFavorite: false,
+        isNotifying: false,
       );
 
       // Act
       final updated = original.copyWith(
         title: 'Culto de Celebração',
         isFavorite: true,
+        isNotifying: true,
       );
 
       // Assert
       expect(updated.id, original.id); // Não alterado
       expect(updated.title, 'Culto de Celebração'); // Alterado
       expect(updated.isFavorite, true); // Alterado
+      expect(updated.isNotifying, true); // Alterado
       expect(updated.church, original.church); // Não alterado
     });
   });

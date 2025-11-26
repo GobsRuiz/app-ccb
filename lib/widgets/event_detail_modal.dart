@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:provider/provider.dart';
@@ -8,6 +6,7 @@ import '../core/error_handler.dart';
 import '../models/event.dart';
 import '../providers/event_provider.dart';
 import '../services/map_service.dart';
+import '../services/toast_service.dart';
 import '../utils/formatters.dart';
 
 class EventDetailModal extends StatefulWidget {
@@ -23,12 +22,8 @@ class EventDetailModal extends StatefulWidget {
 }
 
 class _EventDetailModalState extends State<EventDetailModal> {
-  Timer? _toastTimer;
-
   @override
   void dispose() {
-    // Cancela o timer ao destruir o widget
-    _toastTimer?.cancel();
     super.dispose();
   }
 
@@ -149,11 +144,17 @@ class _EventDetailModalState extends State<EventDetailModal> {
                           flex: 2,
                           child: Consumer<EventProvider>(
                             builder: (context, provider, child) {
+                              final currentEvent = provider.events.firstWhere(
+                                (e) => e.id == widget.event.id,
+                                orElse: () => widget.event,
+                              );
+                              final isFavorite = currentEvent.isFavorite;
+
                               return FButton(
                                 onPress: () {
                                   provider.toggleFavorite(widget.event.id);
                                 },
-                                style: widget.event.isFavorite
+                                style: isFavorite
                                     ? FButtonStyle.primary()
                                     : FButtonStyle.outline(),
                                 child: Row(
@@ -164,7 +165,7 @@ class _EventDetailModalState extends State<EventDetailModal> {
                                     const SizedBox(width: 4),
                                     Flexible(
                                       child: Text(
-                                        widget.event.isFavorite ? 'Favoritado' : 'Favoritar',
+                                        isFavorite ? 'Favoritado' : 'Favoritar',
                                         style: const TextStyle(fontSize: 11),
                                         overflow: TextOverflow.ellipsis,
                                       ),
@@ -178,63 +179,45 @@ class _EventDetailModalState extends State<EventDetailModal> {
                         const SizedBox(width: 8),
                         Expanded(
                           flex: 2,
-                          child: FButton(
-                            onPress: () {
-                              // Cancela timer anterior se existir
-                              _toastTimer?.cancel();
+                          child: Consumer<EventProvider>(
+                            builder: (context, provider, child) {
+                              final currentEvent = provider.events.firstWhere(
+                                (e) => e.id == widget.event.id,
+                                orElse: () => widget.event,
+                              );
+                              final isNotifying = currentEvent.isNotifying;
 
-                              final overlay = Overlay.of(context);
-                              final overlayEntry = OverlayEntry(
-                                builder: (context) => Positioned(
-                                  bottom: 16,
-                                  left: 16,
-                                  right: 16,
-                                  child: Material(
-                                    color: Colors.transparent,
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                        vertical: 14,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFF323232),
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                      child: const Text(
-                                        'Você será notificado sobre este evento',
-                                        style: TextStyle(color: Colors.white),
+                              return FButton(
+                                onPress: () {
+                                  provider.toggleNotification(widget.event.id);
+                                  // Mostra toast apenas quando ativar notificação
+                                  if (!isNotifying) {
+                                    ToastService.showInfo(
+                                      context,
+                                      'Você será notificado sobre este evento',
+                                    );
+                                  }
+                                },
+                                style: isNotifying
+                                    ? FButtonStyle.primary()
+                                    : FButtonStyle.outline(),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(FIcons.bell, size: 14),
+                                    const SizedBox(width: 4),
+                                    Flexible(
+                                      child: Text(
+                                        isNotifying ? 'Notificando' : 'Notificar',
+                                        style: const TextStyle(fontSize: 11),
+                                        overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
-                                  ),
+                                  ],
                                 ),
                               );
-
-                              overlay.insert(overlayEntry);
-
-                              // Cria timer e armazena referência
-                              _toastTimer = Timer(const Duration(seconds: 2), () {
-                                // Verifica se o overlay entry ainda está montado
-                                if (overlayEntry.mounted) {
-                                  overlayEntry.remove();
-                                }
-                              });
                             },
-                            style: FButtonStyle.outline(),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              children: const [
-                                Icon(FIcons.bell, size: 14),
-                                SizedBox(width: 4),
-                                Flexible(
-                                  child: Text(
-                                    'Notificar',
-                                    style: TextStyle(fontSize: 11),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
                           ),
                         ),
                       ],
@@ -251,7 +234,7 @@ class _EventDetailModalState extends State<EventDetailModal> {
                       context,
                       icon: FIcons.mapPin,
                       title: 'Local',
-                      content: '${widget.event.church}\n${widget.event.address}',
+                      content: '${widget.event.church}\n${widget.event.address}\n${widget.event.city}',
                     ),
                     const SizedBox(height: 16),
                     _buildSection(

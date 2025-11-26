@@ -72,7 +72,7 @@ class EventCard extends StatelessWidget {
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
-                    '${event.church} - ${event.address}',
+                    '${event.church} - ${event.address} - ${event.city}',
                     style: theme.typography.sm.copyWith(
                       color: theme.colors.mutedForeground,
                     ),

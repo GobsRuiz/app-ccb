@@ -13,6 +13,7 @@ class EventProvider with ChangeNotifier {
   double _radiusKm = 10.0;
 
   List<Event> get events => _filteredEvents;
+  List<Event> get favoriteEvents => _allEvents.where((event) => event.isFavorite).toList();
   String get selectedCity => _selectedCity;
   Set<String> get selectedEventTypes => _selectedEventTypes;
   DateTime? get startDate => _startDate;
@@ -37,61 +38,143 @@ class EventProvider with ChangeNotifier {
 
   void _loadMockData() {
     _allEvents = [
+      // Batismos
       Event(
         id: '1',
-        title: 'Culto de Louvor e Adoração',
+        title: 'Batismo nas Águas',
         date: DateTime.now().add(const Duration(days: 2)),
-        time: '19:00',
-        church: 'Igreja Batista Central',
-        address: 'Rua das Flores, 123 - Centro',
+        time: '15:00',
+        church: 'Igreja Batista de Taquaritinga',
+        address: 'Rua São Paulo, 450 - Centro',
+        city: 'Taquaritinga',
         conductor: 'Pastor João Silva',
-        description: 'Culto especial de louvor e adoração com ministração da palavra.',
-        latitude: -23.550520,
-        longitude: -46.633308,
+        description: 'Cerimônia de batismo nas águas com celebração especial.',
+        latitude: -21.408333,
+        longitude: -48.505833,
         attachments: [],
-        eventType: 'Culto',
+        eventType: 'Batismos',
       ),
       Event(
         id: '2',
-        title: 'Estudo Bíblico',
+        title: 'Batismo e Ceia',
         date: DateTime.now().add(const Duration(days: 5)),
-        time: '20:00',
-        church: 'Igreja Presbiteriana do Brasil',
-        address: 'Av. Paulista, 456',
-        conductor: 'Pastor Maria Santos',
-        description: 'Estudo aprofundado do livro de Romanos.',
-        latitude: -23.561684,
-        longitude: -46.655981,
+        time: '16:00',
+        church: 'Igreja Metodista Central',
+        address: 'Av. Doutor Carlos Botelho, 1200',
+        city: 'São Carlos',
+        conductor: 'Pastora Ana Paula',
+        description: 'Batismo seguido de santa ceia.',
+        latitude: -22.017532,
+        longitude: -47.890939,
         attachments: [],
-        eventType: 'Estudo',
+        eventType: 'Batismos',
       ),
       Event(
         id: '3',
-        title: 'Vigília de Oração',
-        date: DateTime.now().add(const Duration(days: 7)),
-        time: '22:00',
-        church: 'Assembleia de Deus',
-        address: 'Rua dos Apóstolos, 789',
-        conductor: 'Pastor Pedro Oliveira',
-        description: 'Noite de oração e intercessão pela cidade.',
-        latitude: -23.533773,
-        longitude: -46.625290,
+        title: 'Batismo Especial',
+        date: DateTime.now().add(const Duration(days: 8)),
+        time: '14:00',
+        church: 'Igreja Presbiteriana',
+        address: 'Rua Nove de Julho, 789',
+        city: 'Ribeirão Preto',
+        conductor: 'Pastor Roberto Lima',
+        description: 'Batismo especial com momento de louvor.',
+        latitude: -21.170401,
+        longitude: -47.810326,
         attachments: [],
-        eventType: 'Vigília',
+        eventType: 'Batismos',
       ),
+      // Reuniões para Mocidade
       Event(
         id: '4',
-        title: 'Conferência de Jovens',
-        date: DateTime.now().add(const Duration(days: 10)),
-        time: '18:00',
-        church: 'Igreja Metodista',
-        address: 'Praça da Sé, 100',
-        conductor: 'Pastor Lucas Ferreira',
-        description: 'Conferência especial para jovens com louvores e pregações.',
-        latitude: -23.550385,
-        longitude: -46.634290,
+        title: 'Encontro de Jovens',
+        date: DateTime.now().add(const Duration(days: 3)),
+        time: '19:30',
+        church: 'Igreja Adventista',
+        address: 'Rua Luiz de Camões, 320',
+        city: 'Matão',
+        conductor: 'Líder Marcos Vieira',
+        description: 'Reunião especial da mocidade com louvor e palavra.',
+        latitude: -21.602778,
+        longitude: -48.365833,
         attachments: [],
-        eventType: 'Conferência',
+        eventType: 'Reuniões para Mocidade',
+      ),
+      Event(
+        id: '5',
+        title: 'Célula de Jovens',
+        date: DateTime.now().add(const Duration(days: 6)),
+        time: '20:00',
+        church: 'Igreja Batista de Taquaritinga',
+        address: 'Rua São Paulo, 450 - Centro',
+        city: 'Taquaritinga',
+        conductor: 'Líder Júlia Santos',
+        description: 'Célula semanal de jovens com estudo bíblico.',
+        latitude: -21.408333,
+        longitude: -48.505833,
+        attachments: [],
+        eventType: 'Reuniões para Mocidade',
+      ),
+      Event(
+        id: '6',
+        title: 'Mocidade em Ação',
+        date: DateTime.now().add(const Duration(days: 9)),
+        time: '18:30',
+        church: 'Igreja Assembleia de Deus',
+        address: 'Rua Conde do Pinhal, 1500',
+        city: 'São Carlos',
+        conductor: 'Pastor Pedro Oliveira',
+        description: 'Encontro mensal da mocidade regional.',
+        latitude: -22.007532,
+        longitude: -47.895939,
+        attachments: [],
+        eventType: 'Reuniões para Mocidade',
+      ),
+      // Ensaios Musicais Regionais
+      Event(
+        id: '7',
+        title: 'Ensaio Regional - Soprano',
+        date: DateTime.now().add(const Duration(days: 4)),
+        time: '19:00',
+        church: 'Congregação Central',
+        address: 'Av. Presidente Vargas, 2300',
+        city: 'Ribeirão Preto',
+        conductor: 'Maestro Carlos Eduardo',
+        description: 'Ensaio regional do coral soprano.',
+        latitude: -21.177401,
+        longitude: -47.815326,
+        attachments: [],
+        eventType: 'Ensaios Musicais Regionais',
+      ),
+      Event(
+        id: '8',
+        title: 'Ensaio Geral da Orquestra',
+        date: DateTime.now().add(const Duration(days: 7)),
+        time: '15:00',
+        church: 'Igreja Matriz',
+        address: 'Praça da Independência, 50',
+        city: 'Matão',
+        conductor: 'Maestrina Maria Helena',
+        description: 'Ensaio geral da orquestra regional.',
+        latitude: -21.607778,
+        longitude: -48.370833,
+        attachments: [],
+        eventType: 'Ensaios Musicais Regionais',
+      ),
+      Event(
+        id: '9',
+        title: 'Ensaio Regional - Tenor',
+        date: DateTime.now().add(const Duration(days: 10)),
+        time: '19:00',
+        church: 'Congregação Central',
+        address: 'Av. Presidente Vargas, 2300',
+        city: 'Ribeirão Preto',
+        conductor: 'Maestro Carlos Eduardo',
+        description: 'Ensaio regional do coral tenor.',
+        latitude: -21.177401,
+        longitude: -47.815326,
+        attachments: [],
+        eventType: 'Ensaios Musicais Regionais',
       ),
     ];
 
@@ -167,6 +250,16 @@ class EventProvider with ChangeNotifier {
     if (index != -1) {
       _allEvents[index] = _allEvents[index].copyWith(
         isFavorite: !_allEvents[index].isFavorite,
+      );
+      _applyFilters();
+    }
+  }
+
+  void toggleNotification(String eventId) {
+    final index = _allEvents.indexWhere((e) => e.id == eventId);
+    if (index != -1) {
+      _allEvents[index] = _allEvents[index].copyWith(
+        isNotifying: !_allEvents[index].isNotifying,
       );
       _applyFilters();
     }

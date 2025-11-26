@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:provider/provider.dart';
+import '../data/brazil_locations.dart';
 import '../providers/event_provider.dart';
 
 class FilterModal extends StatefulWidget {
@@ -20,87 +21,6 @@ class _FilterModalState extends State<FilterModal> {
   String _selectedState = 'SP';
   String _selectedCity = 'São Paulo';
 
-  final List<String> _eventTypes = [
-    'Culto',
-    'Estudo',
-    'Vigília',
-    'Conferência',
-    'Reunião',
-    'Evento Especial',
-  ];
-
-  final Map<String, String> _states = {
-    'AC': 'Acre',
-    'AL': 'Alagoas',
-    'AP': 'Amapá',
-    'AM': 'Amazonas',
-    'BA': 'Bahia',
-    'CE': 'Ceará',
-    'DF': 'Distrito Federal',
-    'ES': 'Espírito Santo',
-    'GO': 'Goiás',
-    'MA': 'Maranhão',
-    'MT': 'Mato Grosso',
-    'MS': 'Mato Grosso do Sul',
-    'MG': 'Minas Gerais',
-    'PA': 'Pará',
-    'PB': 'Paraíba',
-    'PR': 'Paraná',
-    'PE': 'Pernambuco',
-    'PI': 'Piauí',
-    'RJ': 'Rio de Janeiro',
-    'RN': 'Rio Grande do Norte',
-    'RS': 'Rio Grande do Sul',
-    'RO': 'Rondônia',
-    'RR': 'Roraima',
-    'SC': 'Santa Catarina',
-    'SP': 'São Paulo',
-    'SE': 'Sergipe',
-    'TO': 'Tocantins',
-  };
-
-  final Map<String, List<String>> _citiesByState = {
-    'AC': ['Rio Branco'],
-    'AL': ['Maceió'],
-    'AP': ['Macapá'],
-    'AM': ['Manaus'],
-    'BA': ['Salvador'],
-    'CE': ['Fortaleza'],
-    'DF': ['Brasília'],
-    'ES': ['Vitória'],
-    'GO': ['Goiânia'],
-    'MA': ['São Luís'],
-    'MT': ['Cuiabá'],
-    'MS': ['Campo Grande'],
-    'MG': ['Belo Horizonte'],
-    'PA': ['Belém'],
-    'PB': ['João Pessoa'],
-    'PR': ['Curitiba'],
-    'PE': ['Recife'],
-    'PI': ['Teresina'],
-    'RJ': ['Rio de Janeiro'],
-    'RN': ['Natal'],
-    'RS': ['Porto Alegre'],
-    'RO': ['Porto Velho'],
-    'RR': ['Boa Vista'],
-    'SC': ['Florianópolis'],
-    'SP': [
-      'São Paulo',
-      'Ribeirão Preto',
-      'São Carlos',
-      'Taquaritinga',
-      'Matão',
-      'Catanduva',
-      'Guariroba',
-      'Guariba',
-      'São José do Rio Preto',
-      'Araraquara',
-      'Barretos',
-    ],
-    'SE': ['Aracaju'],
-    'TO': ['Palmas'],
-  };
-
   @override
   void initState() {
     super.initState();
@@ -111,7 +31,7 @@ class _FilterModalState extends State<FilterModal> {
     _selectedTypes.addAll(provider.selectedEventTypes);
 
     final city = provider.selectedCity;
-    for (final entry in _citiesByState.entries) {
+    for (final entry in BrazilLocations.citiesByState.entries) {
       if (entry.value.contains(city)) {
         _selectedState = entry.key;
         _selectedCity = city;
@@ -119,7 +39,7 @@ class _FilterModalState extends State<FilterModal> {
       }
     }
 
-    _stateController = TextEditingController(text: '${_states[_selectedState]} ($_selectedState)');
+    _stateController = TextEditingController(text: '${BrazilLocations.states[_selectedState]} ($_selectedState)');
     _cityController = TextEditingController(text: _selectedCity);
   }
 
@@ -189,240 +109,353 @@ class _FilterModalState extends State<FilterModal> {
   Widget build(BuildContext context) {
     final theme = context.theme;
 
-    return Dialog(
-      child: Container(
-        constraints: const BoxConstraints(maxWidth: 500, maxHeight: 600),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Filtros',
-                    style: theme.typography.xl2.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: theme.colors.foreground,
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(FIcons.x),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                ],
-              ),
+    return DraggableScrollableSheet(
+      initialChildSize: 0.9,
+      minChildSize: 0.5,
+      maxChildSize: 0.95,
+      builder: (context, scrollController) {
+        return Container(
+          decoration: BoxDecoration(
+            color: theme.colors.background,
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(20),
             ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          ),
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16.0),
+                decoration: BoxDecoration(
+                  color: theme.colors.background,
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(20),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: theme.colors.border,
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Estado',
-                      style: theme.typography.sm.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: theme.colors.foreground,
+                    Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: theme.colors.border,
+                        borderRadius: BorderRadius.circular(2),
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    Autocomplete<String>(
-                      initialValue: TextEditingValue(text: _stateController.text),
-                      optionsBuilder: (textEditingValue) {
-                        if (textEditingValue.text.isEmpty) {
-                          return _states.entries.map((e) => '${e.value} (${e.key})');
-                        }
-                        return _states.entries
-                            .where((entry) =>
-                                entry.value.toLowerCase().contains(textEditingValue.text.toLowerCase()) ||
-                                entry.key.toLowerCase().contains(textEditingValue.text.toLowerCase()))
-                            .map((e) => '${e.value} (${e.key})');
-                      },
-                      onSelected: (String selection) {
-                        final uf = selection.substring(selection.lastIndexOf('(') + 1, selection.lastIndexOf(')'));
-                        setState(() {
-                          _selectedState = uf;
-                          final cities = _citiesByState[uf] ?? [];
-                          _selectedCity = cities.isNotEmpty ? cities.first : '';
-                          _stateController.text = selection;
-                          _cityController.text = _selectedCity;
-                        });
-                      },
-                      fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
-                        if (controller.text.isEmpty && _stateController.text.isNotEmpty) {
-                          controller.text = _stateController.text;
-                        }
-                        return TextField(
-                          controller: controller,
-                          focusNode: focusNode,
-                          decoration: InputDecoration(
-                            hintText: 'Buscar estado...',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                          ),
-                        );
-                      },
                     ),
                     const SizedBox(height: 16),
-                    Text(
-                      'Cidade',
-                      style: theme.typography.sm.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: theme.colors.foreground,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Autocomplete<String>(
-                      key: ValueKey(_selectedState),
-                      initialValue: TextEditingValue(text: _selectedCity),
-                      optionsBuilder: (textEditingValue) {
-                        final cities = _citiesByState[_selectedState] ?? [];
-                        if (textEditingValue.text.isEmpty) {
-                          return cities;
-                        }
-                        return cities.where((city) =>
-                            city.toLowerCase().contains(textEditingValue.text.toLowerCase()));
-                      },
-                      onSelected: (String selection) {
-                        setState(() {
-                          _selectedCity = selection;
-                          _cityController.text = selection;
-                        });
-                      },
-                      fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
-                        return TextField(
-                          controller: controller,
-                          focusNode: focusNode,
-                          decoration: InputDecoration(
-                            hintText: 'Buscar cidade...',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                          ),
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Raio: ${_radius.toStringAsFixed(1)} km',
-                      style: theme.typography.sm.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: theme.colors.foreground,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Slider(
-                      value: _radius,
-                      min: 1,
-                      max: 50,
-                      divisions: 49,
-                      onChanged: (value) {
-                        setState(() {
-                          _radius = value;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Período',
-                      style: theme.typography.sm.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: theme.colors.foreground,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
-                          child: FButton(
-                            onPress: () => _selectDate(context, true),
-                            style: FButtonStyle.outline(),
-                            child: Text(
-                              _startDate != null
-                                  ? '${_startDate!.day}/${_startDate!.month}'
-                                  : 'Data inicial',
+                          child: Text(
+                            'Filtros',
+                            style: theme.typography.xl2.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: theme.colors.foreground,
                             ),
                           ),
                         ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: FButton(
-                            onPress: () => _selectDate(context, false),
-                            style: FButtonStyle.outline(),
-                            child: Text(
-                              _endDate != null
-                                  ? '${_endDate!.day}/${_endDate!.month}'
-                                  : 'Data final',
-                            ),
-                          ),
+                        IconButton(
+                          icon: const Icon(FIcons.x),
+                          onPressed: () => Navigator.of(context).pop(),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Tipos de Evento',
-                      style: theme.typography.sm.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: theme.colors.foreground,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: _eventTypes.map((type) {
-                        final isSelected = _selectedTypes.contains(type);
-                        return FButton(
-                          onPress: () {
-                            setState(() {
-                              if (isSelected) {
-                                _selectedTypes.remove(type);
-                              } else {
-                                _selectedTypes.add(type);
-                              }
-                            });
-                          },
-                          style: isSelected
-                              ? FButtonStyle.primary()
-                              : FButtonStyle.outline(),
-                          child: Text(type),
-                        );
-                      }).toList(),
-                    ),
-                    const SizedBox(height: 24),
                   ],
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: FButton(
-                      onPress: _clearFilters,
-                      style: FButtonStyle.outline(),
-                      child: const Text('Limpar'),
+              Expanded(
+                child: ListView(
+                  controller: scrollController,
+                  padding: const EdgeInsets.all(16.0),
+                  children: [
+                    FCard(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  FIcons.mapPin,
+                                  size: 20,
+                                  color: theme.colors.primary,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Localização',
+                                  style: theme.typography.base.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: theme.colors.foreground,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'Estado',
+                              style: theme.typography.sm.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: theme.colors.foreground,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Autocomplete<String>(
+                              initialValue: TextEditingValue(text: _stateController.text),
+                              optionsBuilder: (textEditingValue) {
+                                if (textEditingValue.text.isEmpty) {
+                                  return BrazilLocations.states.entries.map((e) => '${e.value} (${e.key})');
+                                }
+                                return BrazilLocations.states.entries
+                                    .where((entry) =>
+                                        entry.value.toLowerCase().contains(textEditingValue.text.toLowerCase()) ||
+                                        entry.key.toLowerCase().contains(textEditingValue.text.toLowerCase()))
+                                    .map((e) => '${e.value} (${e.key})');
+                              },
+                              onSelected: (String selection) {
+                                final uf = selection.substring(selection.lastIndexOf('(') + 1, selection.lastIndexOf(')'));
+                                setState(() {
+                                  _selectedState = uf;
+                                  final cities = BrazilLocations.citiesByState[uf] ?? [];
+                                  _selectedCity = cities.isNotEmpty ? cities.first : '';
+                                  _stateController.text = selection;
+                                  _cityController.text = _selectedCity;
+                                });
+                              },
+                              fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
+                                if (controller.text.isEmpty && _stateController.text.isNotEmpty) {
+                                  controller.text = _stateController.text;
+                                }
+                                return TextField(
+                                  controller: controller,
+                                  focusNode: focusNode,
+                                  decoration: InputDecoration(
+                                    hintText: 'Buscar estado...',
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                                  ),
+                                );
+                              },
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'Cidade',
+                              style: theme.typography.sm.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: theme.colors.foreground,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Autocomplete<String>(
+                              key: ValueKey(_selectedState),
+                              initialValue: TextEditingValue(text: _selectedCity),
+                              optionsBuilder: (textEditingValue) {
+                                final cities = BrazilLocations.citiesByState[_selectedState] ?? [];
+                                if (textEditingValue.text.isEmpty) {
+                                  return cities;
+                                }
+                                return cities.where((city) =>
+                                    city.toLowerCase().contains(textEditingValue.text.toLowerCase()));
+                              },
+                              onSelected: (String selection) {
+                                setState(() {
+                                  _selectedCity = selection;
+                                  _cityController.text = selection;
+                                });
+                              },
+                              fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
+                                return TextField(
+                                  controller: controller,
+                                  focusNode: focusNode,
+                                  decoration: InputDecoration(
+                                    hintText: 'Buscar cidade...',
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                                  ),
+                                );
+                              },
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'Raio: ${_radius.toStringAsFixed(1)} km',
+                              style: theme.typography.sm.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: theme.colors.foreground,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Slider(
+                              value: _radius,
+                              min: 1,
+                              max: 50,
+                              divisions: 49,
+                              onChanged: (value) {
+                                setState(() {
+                                  _radius = value;
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: FButton(
-                      onPress: _applyFilters,
-                      child: const Text('Aplicar'),
+                    const SizedBox(height: 16),
+                    FCard(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  FIcons.calendar,
+                                  size: 20,
+                                  color: theme.colors.primary,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Período',
+                                  style: theme.typography.base.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: theme.colors.foreground,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: FButton(
+                                    onPress: () => _selectDate(context, true),
+                                    style: FButtonStyle.outline(),
+                                    child: Text(
+                                      _startDate != null
+                                          ? '${_startDate!.day}/${_startDate!.month}'
+                                          : 'Data inicial',
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: FButton(
+                                    onPress: () => _selectDate(context, false),
+                                    style: FButtonStyle.outline(),
+                                    child: Text(
+                                      _endDate != null
+                                          ? '${_endDate!.day}/${_endDate!.month}'
+                                          : 'Data final',
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 16),
+                    FCard(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  FIcons.tag,
+                                  size: 20,
+                                  color: theme.colors.primary,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Tipos de Evento',
+                                  style: theme.typography.base.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: theme.colors.foreground,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: BrazilLocations.eventTypes.map((type) {
+                                final isSelected = _selectedTypes.contains(type);
+                                return FButton(
+                                  onPress: () {
+                                    setState(() {
+                                      if (isSelected) {
+                                        _selectedTypes.remove(type);
+                                      } else {
+                                        _selectedTypes.add(type);
+                                      }
+                                    });
+                                  },
+                                  style: isSelected
+                                      ? FButtonStyle.primary()
+                                      : FButtonStyle.outline(),
+                                  child: Text(type),
+                                );
+                              }).toList(),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 80),
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
-      ),
+              Container(
+                padding: const EdgeInsets.all(16.0),
+                decoration: BoxDecoration(
+                  color: theme.colors.background,
+                  boxShadow: [
+                    BoxShadow(
+                      color: theme.colors.border,
+                      blurRadius: 4,
+                      offset: const Offset(0, -2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: FButton(
+                        onPress: _clearFilters,
+                        style: FButtonStyle.outline(),
+                        child: const Text('Limpar'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: FButton(
+                        onPress: _applyFilters,
+                        child: const Text('Aplicar'),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

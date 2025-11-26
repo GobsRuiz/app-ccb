@@ -5,6 +5,7 @@ class Event {
   final String time;
   final String church;
   final String address;
+  final String city;
   final String conductor;
   final String description;
   final double latitude;
@@ -12,6 +13,7 @@ class Event {
   final List<String> attachments;
   final String eventType;
   final bool isFavorite;
+  final bool isNotifying;
 
   Event({
     required this.id,
@@ -20,6 +22,7 @@ class Event {
     required this.time,
     required this.church,
     required this.address,
+    required this.city,
     required this.conductor,
     required this.description,
     required this.latitude,
@@ -27,6 +30,7 @@ class Event {
     this.attachments = const [],
     required this.eventType,
     this.isFavorite = false,
+    this.isNotifying = false,
   });
 
   Event copyWith({
@@ -36,6 +40,7 @@ class Event {
     String? time,
     String? church,
     String? address,
+    String? city,
     String? conductor,
     String? description,
     double? latitude,
@@ -43,6 +48,7 @@ class Event {
     List<String>? attachments,
     String? eventType,
     bool? isFavorite,
+    bool? isNotifying,
   }) {
     return Event(
       id: id ?? this.id,
@@ -51,6 +57,7 @@ class Event {
       time: time ?? this.time,
       church: church ?? this.church,
       address: address ?? this.address,
+      city: city ?? this.city,
       conductor: conductor ?? this.conductor,
       description: description ?? this.description,
       latitude: latitude ?? this.latitude,
@@ -58,6 +65,7 @@ class Event {
       attachments: attachments ?? this.attachments,
       eventType: eventType ?? this.eventType,
       isFavorite: isFavorite ?? this.isFavorite,
+      isNotifying: isNotifying ?? this.isNotifying,
     );
   }
 
@@ -81,6 +89,9 @@ class Event {
       }
       if (json['address'] == null || json['address'].toString().isEmpty) {
         throw FormatException('Event.address is required and cannot be empty');
+      }
+      if (json['city'] == null || json['city'].toString().isEmpty) {
+        throw FormatException('Event.city is required and cannot be empty');
       }
       if (json['conductor'] == null || json['conductor'].toString().isEmpty) {
         throw FormatException('Event.conductor is required and cannot be empty');
@@ -124,6 +135,7 @@ class Event {
         time: json['time'] as String,
         church: json['church'] as String,
         address: json['address'] as String,
+        city: json['city'] as String,
         conductor: json['conductor'] as String,
         description: json['description'] as String,
         latitude: lat,
@@ -134,6 +146,7 @@ class Event {
             [],
         eventType: json['eventType'] as String,
         isFavorite: json['isFavorite'] as bool? ?? false,
+        isNotifying: json['isNotifying'] as bool? ?? false,
       );
     } catch (e) {
       // Re-lança o erro com contexto adicional para facilitar debug
@@ -151,6 +164,7 @@ class Event {
       'time': time,
       'church': church,
       'address': address,
+      'city': city,
       'conductor': conductor,
       'description': description,
       'latitude': latitude,
@@ -158,6 +172,7 @@ class Event {
       'attachments': attachments,
       'eventType': eventType,
       'isFavorite': isFavorite,
+      'isNotifying': isNotifying,
     };
   }
 }

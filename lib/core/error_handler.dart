@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/toast_service.dart';
 
 /// Classe centralizada para tratamento de erros
 /// Responsável por logging e exibição de erros ao usuário
@@ -32,66 +33,6 @@ class ErrorHandler {
   /// [context] - BuildContext para mostrar o toast
   /// [message] - Mensagem de erro amigável para o usuário
   static void showToUser(BuildContext context, String message) {
-    // Verifica se o context ainda está montado
-    if (!context.mounted) {
-      debugPrint('Cannot show error: context not mounted. Message: $message');
-      return;
-    }
-
-    // Usa FToast do Forui para mostrar erro
-    final overlay = Overlay.of(context);
-    final overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        top: 50,
-        left: 16,
-        right: 16,
-        child: Material(
-          color: Colors.transparent,
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: const Color(0xFFDC2626), // Vermelho de erro
-              borderRadius: BorderRadius.circular(8),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.error_outline,
-                  color: Colors.white,
-                  size: 24,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    message,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-
-    overlay.insert(overlayEntry);
-
-    // Remove após 3 segundos
-    Future.delayed(const Duration(seconds: 3), () {
-      if (overlayEntry.mounted) {
-        overlayEntry.remove();
-      }
-    });
+    ToastService.showError(context, message);
   }
 }
